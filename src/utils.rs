@@ -6,7 +6,12 @@ pub const CANVAS_BOUND_X: i32 = (CANVAS_WIDTH / 2) as i32;
 pub const CANVAS_BOUND_Y: i32 = (CANVAS_HEIGHT / 2) as i32;
 
 // Colors
-pub const WHITE: Color = Color(255, 255, 255);
-// pub const RED: Color = Color(255, 0, 0);
-// pub const GREEN: Color = Color(0, 255, 255);
-// pub const BLUE: Color = Color(0, 0, 255);
+
+#[allow(dead_code)]
+pub mod colors {
+    use super::Color;
+    pub const RED: Color = Color::from(0xff0000);
+    pub const GREEN: Color = Color::from(0x00ff00);
+    pub const BLUE: Color = Color::from(0x0000ff);
+    pub const WHITE: Color = Color::from(0xffffff);
+}

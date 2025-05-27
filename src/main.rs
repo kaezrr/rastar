@@ -3,7 +3,7 @@ mod utils;
 
 use canvas::{Canvas, Point2D};
 use minifb::{Key, Window, WindowOptions};
-use utils::{CANVAS_HEIGHT, CANVAS_WIDTH, WHITE};
+use utils::{CANVAS_HEIGHT, CANVAS_WIDTH, colors::GREEN};
 
 fn main() {
     let mut canvas = Canvas::new();
@@ -17,11 +17,11 @@ fn main() {
         panic!("{}", e);
     });
 
-    canvas.draw_wireframe_triangle(
-        Point2D(-200, -250),
-        Point2D(200, 50),
-        Point2D(20, 250),
-        &WHITE,
+    canvas.draw_filled_triangle(
+        Point2D::from(-200, -250),
+        Point2D::from(200, 50),
+        Point2D::from(20, 250),
+        &GREEN,
     );
 
     window.set_target_fps(60);
