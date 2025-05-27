@@ -1,49 +1,7 @@
-use crate::utils::{CANVAS_BOUND_X, CANVAS_BOUND_Y, CANVAS_HEIGHT, CANVAS_WIDTH};
+use crate::colors::Color;
+use crate::utils::{CANVAS_BOUND_X, CANVAS_BOUND_Y, CANVAS_HEIGHT, CANVAS_WIDTH, interpolate};
+use crate::vertex::Vertex;
 use std::panic;
-
-#[derive(Debug, Clone, Copy)]
-pub struct Vertex {
-    x: i32,
-    y: i32,
-    h: f64,
-}
-
-impl Vertex {
-    pub fn new(x: i32, y: i32, h: Option<f64>) -> Self {
-        Vertex {
-            x,
-            y,
-            h: h.unwrap_or(1.0),
-        }
-    }
-}
-
-pub struct Color {
-    r: u8,
-    g: u8,
-    b: u8,
-}
-
-impl Color {
-    pub const fn new(hexcode: u32) -> Self {
-        Color {
-            r: (hexcode >> 16) as u8,
-            g: (hexcode >> 8) as u8,
-            b: hexcode as u8,
-        }
-    }
-
-    pub fn as_u32(&self) -> u32 {
-        u32::from(self.r) << 16 | u32::from(self.g) << 8 | u32::from(self.b)
-    }
-
-    pub fn scale(&mut self, factor: f64) -> &Self {
-        self.r = (self.r as f64 * factor).round().clamp(0.0, 255.0) as u8;
-        self.g = (self.g as f64 * factor).round().clamp(0.0, 255.0) as u8;
-        self.b = (self.b as f64 * factor).round().clamp(0.0, 255.0) as u8;
-        self
-    }
-}
 
 pub struct Canvas {
     pub buffer: Vec<u32>,
@@ -113,42 +71,44 @@ impl Canvas {
         }
 
         let x01 = interpolate(p0.y, p0.x as f64, p1.y, p1.x as f64);
+        let h01 = interpolate(p0.y, p0.h, p1.y, p1.h);
+
         let x12 = interpolate(p1.y, p1.x as f64, p2.y, p2.x as f64);
+        let h12 = interpolate(p1.y, p1.h, p2.y, p2.h);
+
         let x02 = interpolate(p0.y, p0.x as f64, p2.y, p2.x as f64);
+        let h02 = interpolate(p0.y, p0.h, p2.y, p2.h);
 
         let mut x012 = x01;
         x012.pop();
         x012.extend(x12);
 
+        let mut h012 = h01;
+        h012.pop();
+        h012.extend(h12);
+
         let m = x02.len() / 2;
-        let (x_left, x_right) = if x02[m] < x012[m] {
-            (x02, x012)
+        let (x_left, h_left, x_right, h_right) = if x02[m] < x012[m] {
+            (x02, h02, x012, h012)
         } else {
-            (x012, x02)
+            (x012, h012, x02, h02)
         };
 
         for y in p0.y..=p2.y {
-            let leftx = x_left[(y - p0.y) as usize].round() as i32;
-            let rightx = x_right[(y - p0.y) as usize].round() as i32;
+            let x_l = x_left[(y - p0.y) as usize].round() as i32;
+            let x_r = x_right[(y - p0.y) as usize].round() as i32;
 
-            for x in leftx..=rightx {
-                self.put_pixel(Vertex::new(x, y, None), color);
+            let h_segment = interpolate(
+                x_l,
+                h_left[(y - p0.y) as usize],
+                x_r,
+                h_right[(y - p0.y) as usize],
+            );
+
+            for x in x_l..=x_r {
+                let shaded_color = color.scaled(h_segment[(x - x_l) as usize]);
+                self.put_pixel(Vertex::new(x, y, None), &shaded_color);
             }
         }
     }
-}
-
-fn interpolate(i0: i32, d0: f64, i1: i32, d1: f64) -> Vec<f64> {
-    if i0 == i1 {
-        return vec![d0];
-    }
-
-    let mut values = Vec::new();
-    let a = (d1 - d0) / (i1 - i0) as f64;
-    let mut b = d0;
-    for _ in i0..=i1 {
-        values.push(b);
-        b += a;
-    }
-    values
 }

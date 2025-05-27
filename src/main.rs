@@ -1,9 +1,13 @@
 mod canvas;
+mod colors;
 mod utils;
+mod vertex;
 
-use canvas::{Canvas, Vertex};
+use canvas::Canvas;
+use colors::constants::GREEN;
 use minifb::{Key, Window, WindowOptions};
-use utils::{CANVAS_HEIGHT, CANVAS_WIDTH, colors::GREEN};
+use utils::{CANVAS_HEIGHT, CANVAS_WIDTH};
+use vertex::Vertex;
 
 fn main() {
     let mut canvas = Canvas::new();
@@ -18,9 +22,9 @@ fn main() {
     });
 
     canvas.draw_filled_triangle(
-        Vertex::new(-200, -250, None),
-        Vertex::new(200, 50, None),
-        Vertex::new(20, 250, None),
+        Vertex::new(-200, -250, Some(0.5)),
+        Vertex::new(200, 50, Some(0.1)),
+        Vertex::new(20, 250, Some(1.0)),
         &GREEN,
     );
 
