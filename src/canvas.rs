@@ -2,14 +2,19 @@ use crate::utils::{CANVAS_BOUND_X, CANVAS_BOUND_Y, CANVAS_HEIGHT, CANVAS_WIDTH};
 use std::panic;
 
 #[derive(Debug, Clone, Copy)]
-pub struct Point2D {
+pub struct Vertex {
     x: i32,
     y: i32,
+    h: f64,
 }
 
-impl Point2D {
-    pub fn from(x: i32, y: i32) -> Self {
-        Point2D { x, y }
+impl Vertex {
+    pub fn new(x: i32, y: i32, h: Option<f64>) -> Self {
+        Vertex {
+            x,
+            y,
+            h: h.unwrap_or(1.0),
+        }
     }
 }
 
@@ -20,7 +25,7 @@ pub struct Color {
 }
 
 impl Color {
-    pub const fn from(hexcode: u32) -> Self {
+    pub const fn new(hexcode: u32) -> Self {
         Color {
             r: (hexcode >> 16) as u8,
             g: (hexcode >> 8) as u8,
@@ -52,7 +57,7 @@ impl Canvas {
         }
     }
 
-    fn put_pixel(&mut self, p: Point2D, color: &Color) {
+    fn put_pixel(&mut self, p: Vertex, color: &Color) {
         if p.x < -CANVAS_BOUND_X || p.x >= CANVAS_BOUND_X {
             panic!("{p:?} lies outside screen width!");
         }
@@ -66,7 +71,7 @@ impl Canvas {
         self.buffer[screeny * CANVAS_WIDTH + screenx] = color.as_u32();
     }
 
-    fn draw_line(&mut self, mut p0: Point2D, mut p1: Point2D, color: &Color) {
+    fn draw_line(&mut self, mut p0: Vertex, mut p1: Vertex, color: &Color) {
         if (p0.x - p1.x).abs() > (p0.y - p1.y).abs() {
             // Mostly horizontal line
             if p0.x > p1.x {
@@ -75,7 +80,7 @@ impl Canvas {
             let ys = interpolate(p0.x, p0.y as f64, p1.x, p1.y as f64);
             for x in p0.x..=p1.x {
                 let y = ys[(x - p0.x) as usize];
-                self.put_pixel(Point2D::from(x, y.round() as i32), color);
+                self.put_pixel(Vertex::new(x, y.round() as i32, None), color);
             }
         } else {
             // Mostly vertical line
@@ -85,16 +90,16 @@ impl Canvas {
             let xs = interpolate(p0.y, p0.x as f64, p1.y, p1.x as f64);
             for y in p0.y..=p1.y {
                 let x = xs[(y - p0.y) as usize];
-                self.put_pixel(Point2D::from(x.round() as i32, y), color);
+                self.put_pixel(Vertex::new(x.round() as i32, y, None), color);
             }
         }
     }
 
     pub fn draw_filled_triangle(
         &mut self,
-        mut p0: Point2D,
-        mut p1: Point2D,
-        mut p2: Point2D,
+        mut p0: Vertex,
+        mut p1: Vertex,
+        mut p2: Vertex,
         color: &Color,
     ) {
         if p0.y > p1.y {
@@ -127,7 +132,7 @@ impl Canvas {
             let rightx = x_right[(y - p0.y) as usize].round() as i32;
 
             for x in leftx..=rightx {
-                self.put_pixel(Point2D::from(x, y), color);
+                self.put_pixel(Vertex::new(x, y, None), color);
             }
         }
     }

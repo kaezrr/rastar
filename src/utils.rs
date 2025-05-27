@@ -10,8 +10,8 @@ pub const CANVAS_BOUND_Y: i32 = (CANVAS_HEIGHT / 2) as i32;
 #[allow(dead_code)]
 pub mod colors {
     use super::Color;
-    pub const RED: Color = Color::from(0xff0000);
-    pub const GREEN: Color = Color::from(0x00ff00);
-    pub const BLUE: Color = Color::from(0x0000ff);
-    pub const WHITE: Color = Color::from(0xffffff);
+    pub const RED: Color = Color::new(0xff0000);
+    pub const GREEN: Color = Color::new(0x00ff00);
+    pub const BLUE: Color = Color::new(0x0000ff);
+    pub const WHITE: Color = Color::new(0xffffff);
 }
