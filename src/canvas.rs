@@ -1,5 +1,9 @@
 use crate::colors::Color;
-use crate::utils::{CANVAS_BOUND_X, CANVAS_BOUND_Y, CANVAS_HEIGHT, CANVAS_WIDTH, interpolate};
+use crate::instance::Instance;
+use crate::model::Triangle;
+use crate::utils::{
+    CANVAS_BOUND_X, CANVAS_BOUND_Y, CANVAS_HEIGHT, CANVAS_WIDTH, interpolate, project_vertex,
+};
 use crate::vertex::Point2D;
 use std::panic;
 
@@ -109,6 +113,45 @@ impl Canvas {
                 let shaded_color = color.scaled(h_segment[(x - x_l) as usize]);
                 self.put_pixel(Point2D::new(x, y, None), &shaded_color);
             }
+        }
+    }
+
+    pub fn draw_wireframe_triangle(
+        &mut self,
+        p0: Point2D,
+        p1: Point2D,
+        p2: Point2D,
+        color: &Color,
+    ) {
+        self.draw_line(p0, p1, color);
+        self.draw_line(p1, p2, color);
+        self.draw_line(p2, p0, color);
+    }
+
+    pub fn render_instance(&mut self, instance: &Instance) {
+        let mut projected = vec![];
+        for v in instance.model.vertices.iter() {
+            let v_t = instance.transform.get_transformed_vertex(v);
+            projected.push(project_vertex(v_t));
+        }
+
+        for t in instance.model.triangles.iter() {
+            self.render_triangle(t, &projected);
+        }
+    }
+
+    pub fn render_triangle(&mut self, triangle: &Triangle, projected: &[Point2D]) {
+        self.draw_wireframe_triangle(
+            projected[triangle.v1],
+            projected[triangle.v2],
+            projected[triangle.v3],
+            &triangle.color,
+        );
+    }
+
+    pub fn render_scene(&mut self, scene: &Vec<Instance>) {
+        for instance in scene.iter() {
+            self.render_instance(instance);
         }
     }
 }

@@ -9,14 +9,6 @@ pub const VIEWPORT_HEIGHT: usize = 1;
 pub const VIEWPORT_WIDTH: usize = 1;
 pub const VIEWPORT_DISTANCE: usize = 1;
 
-#[allow(dead_code)]
-pub mod colors {
-    pub const RED: u32 = 0xff0000;
-    pub const GREEN: u32 = 0x00ff00;
-    pub const BLUE: u32 = 0x0000ff;
-    pub const WHITE: u32 = 0xffffff;
-}
-
 pub fn interpolate(i0: i32, d0: f64, i1: i32, d1: f64) -> Vec<f64> {
     if i0 == i1 {
         return vec![d0];
