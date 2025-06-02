@@ -1,6 +1,6 @@
 use crate::colors::Color;
 use crate::utils::{CANVAS_BOUND_X, CANVAS_BOUND_Y, CANVAS_HEIGHT, CANVAS_WIDTH, interpolate};
-use crate::vertex::Vertex;
+use crate::vertex::Point2D;
 use std::panic;
 
 pub struct Canvas {
@@ -11,11 +11,11 @@ pub struct Canvas {
 impl Canvas {
     pub fn new() -> Self {
         Canvas {
-            buffer: vec![0x000000; CANVAS_HEIGHT * CANVAS_WIDTH],
+            buffer: vec![0x1B1E1F; CANVAS_HEIGHT * CANVAS_WIDTH],
         }
     }
 
-    fn put_pixel(&mut self, p: Vertex, color: &Color) {
+    fn put_pixel(&mut self, p: Point2D, color: &Color) {
         if p.x < -CANVAS_BOUND_X || p.x >= CANVAS_BOUND_X {
             panic!("{p:?} lies outside screen width!");
         }
@@ -29,7 +29,7 @@ impl Canvas {
         self.buffer[screeny * CANVAS_WIDTH + screenx] = color.as_u32();
     }
 
-    fn draw_line(&mut self, mut p0: Vertex, mut p1: Vertex, color: &Color) {
+    pub fn draw_line(&mut self, mut p0: Point2D, mut p1: Point2D, color: &Color) {
         if (p0.x - p1.x).abs() > (p0.y - p1.y).abs() {
             // Mostly horizontal line
             if p0.x > p1.x {
@@ -38,7 +38,7 @@ impl Canvas {
             let ys = interpolate(p0.x, p0.y as f64, p1.x, p1.y as f64);
             for x in p0.x..=p1.x {
                 let y = ys[(x - p0.x) as usize];
-                self.put_pixel(Vertex::new(x, y.round() as i32, None), color);
+                self.put_pixel(Point2D::new(x, y.round() as i32, None), color);
             }
         } else {
             // Mostly vertical line
@@ -48,16 +48,16 @@ impl Canvas {
             let xs = interpolate(p0.y, p0.x as f64, p1.y, p1.x as f64);
             for y in p0.y..=p1.y {
                 let x = xs[(y - p0.y) as usize];
-                self.put_pixel(Vertex::new(x.round() as i32, y, None), color);
+                self.put_pixel(Point2D::new(x.round() as i32, y, None), color);
             }
         }
     }
 
     pub fn draw_filled_triangle(
         &mut self,
-        mut p0: Vertex,
-        mut p1: Vertex,
-        mut p2: Vertex,
+        mut p0: Point2D,
+        mut p1: Point2D,
+        mut p2: Point2D,
         color: &Color,
     ) {
         if p0.y > p1.y {
@@ -107,7 +107,7 @@ impl Canvas {
 
             for x in x_l..=x_r {
                 let shaded_color = color.scaled(h_segment[(x - x_l) as usize]);
-                self.put_pixel(Vertex::new(x, y, None), &shaded_color);
+                self.put_pixel(Point2D::new(x, y, None), &shaded_color);
             }
         }
     }

@@ -25,12 +25,3 @@ impl Color {
         }
     }
 }
-
-#[allow(dead_code)]
-pub mod constants {
-    use super::Color;
-    pub const RED: Color = Color::new(0xff0000);
-    pub const GREEN: Color = Color::new(0x00ff00);
-    pub const BLUE: Color = Color::new(0x0000ff);
-    pub const WHITE: Color = Color::new(0xffffff);
-}
