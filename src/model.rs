@@ -1,4 +1,5 @@
-use crate::{colors::Color, vertex::Point3D};
+use crate::colors::Color;
+use glam::Vec3;
 
 pub struct Triangle {
     pub v1: usize,
@@ -19,7 +20,6 @@ impl Triangle {
 }
 
 pub struct Model {
-    pub name: String,
-    pub vertices: Vec<Point3D>,
+    pub vertices: Vec<Vec3>,
     pub triangles: Vec<Triangle>,
 }

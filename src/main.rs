@@ -3,21 +3,21 @@ mod colors;
 mod instance;
 mod model;
 mod utils;
-mod vertex;
 
 use canvas::Canvas;
 use instance::{Instance, Transform};
 use minifb::{Key, Window, WindowOptions};
 use model::{Model, Triangle};
 use utils::{CANVAS_HEIGHT, CANVAS_WIDTH};
-use vertex::Point3D;
+
+use glam::vec3;
 
 fn main() {
     let mut canvas = Canvas::new();
     let mut window = Window::new(
         "Rastar - ESC to exit",
-        CANVAS_WIDTH,
-        CANVAS_HEIGHT,
+        CANVAS_WIDTH as usize,
+        CANVAS_HEIGHT as usize,
         WindowOptions::default(),
     )
     .unwrap_or_else(|e| {
@@ -25,16 +25,15 @@ fn main() {
     });
 
     let cube_model = Model {
-        name: String::from("Cube"),
         vertices: vec![
-            Point3D::new(1.0, 1.0, 1.0, None),
-            Point3D::new(-1.0, 1.0, 1.0, None),
-            Point3D::new(-1.0, -1.0, 1.0, None),
-            Point3D::new(1.0, -1.0, 1.0, None),
-            Point3D::new(1.0, 1.0, -1.0, None),
-            Point3D::new(-1.0, 1.0, -1.0, None),
-            Point3D::new(-1.0, -1.0, -1.0, None),
-            Point3D::new(1.0, -1.0, -1.0, None),
+            vec3(1.0, 1.0, 1.0),
+            vec3(-1.0, 1.0, 1.0),
+            vec3(-1.0, -1.0, 1.0),
+            vec3(1.0, -1.0, 1.0),
+            vec3(1.0, 1.0, -1.0),
+            vec3(-1.0, 1.0, -1.0),
+            vec3(-1.0, -1.0, -1.0),
+            vec3(1.0, -1.0, -1.0),
         ],
         triangles: vec![
             Triangle::new(0, 1, 2, 0xff0000),
@@ -57,7 +56,7 @@ fn main() {
         transform: Transform {
             scale: 1.0,
             rotation: 0.0,
-            translation: Point3D::new(-1.5, 0.0, 7.0, None),
+            translation: vec3(-1.5, 0.0, 7.0),
         },
     };
 
@@ -66,7 +65,7 @@ fn main() {
         transform: Transform {
             scale: 0.8,
             rotation: 45.0,
-            translation: Point3D::new(1.5, 1.5, 7.0, None),
+            translation: vec3(1.5, 1.5, 7.0),
         },
     };
 
@@ -75,7 +74,11 @@ fn main() {
     window.set_target_fps(60);
     while window.is_open() && !window.is_key_down(Key::Escape) {
         window
-            .update_with_buffer(&canvas.buffer, CANVAS_WIDTH, CANVAS_HEIGHT)
+            .update_with_buffer(
+                &canvas.buffer,
+                CANVAS_WIDTH as usize,
+                CANVAS_HEIGHT as usize,
+            )
             .unwrap();
     }
 }
