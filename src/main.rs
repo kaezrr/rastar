@@ -1,13 +1,10 @@
 mod canvas;
-mod colors;
-mod instance;
-mod model;
+mod structs;
 mod utils;
 
 use canvas::Canvas;
-use instance::{Instance, Transform};
 use minifb::{Key, Window, WindowOptions};
-use model::{Model, Triangle};
+use structs::{Instance, Model, Triangle};
 use utils::{CANVAS_HEIGHT, CANVAS_WIDTH};
 
 use glam::vec3;
@@ -51,23 +48,8 @@ fn main() {
         ],
     };
 
-    let cube1 = Instance {
-        model: &cube_model,
-        transform: Transform {
-            scale: 1.0,
-            rotation: 0.0,
-            translation: vec3(-1.5, 0.0, 7.0),
-        },
-    };
-
-    let cube2 = Instance {
-        model: &cube_model,
-        transform: Transform {
-            scale: 0.8,
-            rotation: 45.0,
-            translation: vec3(1.5, 1.5, 7.0),
-        },
-    };
+    let cube1 = Instance::new(&cube_model, 1.0, 0.0, vec3(-1.5, 0.0, 7.0));
+    let cube2 = Instance::new(&cube_model, 1.0, 0.0, vec3(1.5, 1.5, 7.0));
 
     canvas.render_scene(&vec![cube1, cube2]);
 

@@ -1,8 +1,6 @@
+use crate::structs::{Color, Instance, Triangle};
 use glam::{Vec2, vec2};
 
-use crate::colors::Color;
-use crate::instance::Instance;
-use crate::model::Triangle;
 use crate::utils::{
     CANVAS_BOUND_X, CANVAS_BOUND_Y, CANVAS_HEIGHT, CANVAS_WIDTH, interpolate, project_vertex,
 };
@@ -66,9 +64,9 @@ impl Canvas {
 
     // pub fn draw_filled_triangle(
     //     &mut self,
-    //     mut p0: Point2D,
-    //     mut p1: Point2D,
-    //     mut p2: Point2D,
+    //     mut p0: Vec3A,
+    //     mut p1: Vec3A,
+    //     mut p2: Vec3A,
     //     color: &Color,
     // ) {
     //     if p0.y > p1.y {
@@ -81,14 +79,14 @@ impl Canvas {
     //         std::mem::swap(&mut p1, &mut p2);
     //     }
     //
-    //     let x01 = interpolate(p0.y, p0.x as f64, p1.y, p1.x as f64);
-    //     let h01 = interpolate(p0.y, p0.h, p1.y, p1.h);
+    //     let x01 = interpolate(p0.y, p0.x, p1.y, p1.x);
+    //     let h01 = interpolate(p0.y, p0.z, p1.y, p1.z);
     //
-    //     let x12 = interpolate(p1.y, p1.x as f64, p2.y, p2.x as f64);
-    //     let h12 = interpolate(p1.y, p1.h, p2.y, p2.h);
+    //     let x12 = interpolate(p1.y, p1.x, p2.y, p2.x);
+    //     let h12 = interpolate(p1.y, p1.z, p2.y, p2.z);
     //
-    //     let x02 = interpolate(p0.y, p0.x as f64, p2.y, p2.x as f64);
-    //     let h02 = interpolate(p0.y, p0.h, p2.y, p2.h);
+    //     let x02 = interpolate(p0.y, p0.x, p2.y, p2.x);
+    //     let h02 = interpolate(p0.y, p0.z, p2.y, p2.z);
     //
     //     let mut x012 = x01;
     //     x012.pop();
@@ -132,7 +130,7 @@ impl Canvas {
     pub fn render_instance(&mut self, instance: &Instance) {
         let mut projected = vec![];
         for v in instance.model.vertices.iter() {
-            let v_t = instance.transform.get_transformed_vertex(v);
+            let v_t = instance.transform.transform_point3(*v);
             projected.push(project_vertex(v_t));
         }
 
