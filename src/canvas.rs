@@ -1,10 +1,9 @@
 use crate::structs::{Color, Instance, Triangle};
-use glam::{Vec2, vec2};
+use glam::{Affine3A, Mat3A, Vec2, vec2, vec3a};
 
 use crate::utils::{
     CANVAS_BOUND_X, CANVAS_BOUND_Y, CANVAS_HEIGHT, CANVAS_WIDTH, interpolate, project_vertex,
 };
-use std::panic;
 
 pub struct Canvas {
     pub buffer: Vec<u32>,
@@ -22,11 +21,11 @@ impl Canvas {
         let p = vec2(p.x.round(), p.y.round());
 
         if p.x < -CANVAS_BOUND_X || p.x >= CANVAS_BOUND_X {
-            panic!("{p:?} lies outside screen width!");
+            return;
         }
 
         if p.y < -CANVAS_BOUND_Y || p.y >= CANVAS_BOUND_Y {
-            panic!("{p:?} lies outside screen height!");
+            return;
         }
 
         let screen_index = ((CANVAS_BOUND_Y - p.y) * CANVAS_WIDTH) + CANVAS_BOUND_X + p.x;
@@ -127,14 +126,14 @@ impl Canvas {
         self.draw_line(p2, p0, color);
     }
 
-    pub fn render_instance(&mut self, instance: &Instance) {
+    pub fn render_instance(&mut self, instance: &Instance, transform: &Affine3A) {
         let mut projected = vec![];
         for v in instance.model.vertices.iter() {
-            let v_t = instance.transform.transform_point3(*v);
+            let v_t = transform.transform_point3(*v);
             projected.push(project_vertex(v_t));
         }
 
-        for t in instance.model.triangles.iter() {
+        for t in &instance.model.triangles {
             self.render_triangle(t, &projected);
         }
     }
@@ -149,8 +148,14 @@ impl Canvas {
     }
 
     pub fn render_scene(&mut self, scene: &Vec<Instance>) {
-        for instance in scene.iter() {
-            self.render_instance(instance);
+        let m_camera = Affine3A {
+            translation: vec3a(0., 0., 0.),
+            matrix3: Mat3A::from_rotation_y(0.),
+        };
+
+        for instance in scene {
+            let m = m_camera * instance.transform;
+            self.render_instance(instance, &m);
         }
     }
 }

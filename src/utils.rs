@@ -1,4 +1,4 @@
-use glam::{Vec2, Vec3};
+use glam::{Vec2, Vec3, vec2};
 
 pub const CANVAS_WIDTH: f32 = 640.;
 pub const CANVAS_HEIGHT: f32 = 640.;
@@ -22,16 +22,9 @@ pub fn interpolate(i0: i32, d0: f32, i1: i32, d1: f32) -> Vec<f32> {
     values
 }
 
-pub fn viewport_to_canvas(x: f32, y: f32) -> Vec2 {
-    Vec2::new(
-        x * (CANVAS_WIDTH / VIEWPORT_WIDTH),
-        y * (CANVAS_HEIGHT / VIEWPORT_HEIGHT),
-    )
-}
-
 pub fn project_vertex(v: Vec3) -> Vec2 {
-    viewport_to_canvas(
-        v.x * (VIEWPORT_DISTANCE / v.z),
-        v.y * (VIEWPORT_DISTANCE / v.z),
+    vec2(
+        (v.x * VIEWPORT_DISTANCE * CANVAS_WIDTH) / (VIEWPORT_WIDTH * v.z),
+        (v.y * VIEWPORT_DISTANCE * CANVAS_HEIGHT) / (VIEWPORT_HEIGHT * v.z),
     )
 }
