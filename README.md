@@ -1,6 +1,5 @@
 # Rastar
-A software renderer made in Rust...
+A software renderer made in Rust... still working on it... hopefully
 <br>
-![image](https://github.com/user-attachments/assets/d63393d8-9ac1-469b-be9b-59d7ba6ed7d8)
+![image](https://github.com/user-attachments/assets/4bd4a748-ef46-4f23-ac6d-4a9067faf89f)
 <br>
-yeah its incomplete...
