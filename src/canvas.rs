@@ -1,5 +1,5 @@
 use core::f32;
-use std::{f32::consts::FRAC_1_SQRT_2, panic};
+use std::f32::consts::FRAC_1_SQRT_2;
 
 use crate::{
     structs::{Color, Instance, Plane, Triangle},
@@ -25,18 +25,22 @@ impl Canvas {
         }
     }
 
-    pub fn put_pixel(&mut self, p: Vec2, color: &Color) {
+    pub fn put_pixel(&mut self, p: Vec2, z: f32, color: &Color) {
         let p = vec2(p.x.round(), p.y.round());
-
         if p.x < -CANVAS_BOUND_X || p.x >= CANVAS_BOUND_X {
-            panic!("{p} lies outside screen bounds");
+            return;
         }
 
         if p.y < -CANVAS_BOUND_Y || p.y >= CANVAS_BOUND_Y {
-            panic!("{p} lies outside screen bounds");
+            return;
+        }
+        let screen_index = ((CANVAS_BOUND_Y - p.y) * CANVAS_WIDTH) + CANVAS_BOUND_X + p.x;
+
+        if z < self.depth_buffer[screen_index as usize] {
+            return;
         }
 
-        let screen_index = ((CANVAS_BOUND_Y - p.y) * CANVAS_WIDTH) + CANVAS_BOUND_X + p.x;
+        self.depth_buffer[screen_index as usize] = z;
         self.buffer[screen_index as usize] = color.as_u32();
     }
 
@@ -52,7 +56,7 @@ impl Canvas {
 
             for x in x0..=x1 {
                 let y = ys[(x - x0) as usize];
-                self.put_pixel(vec2(x as f32, y), color);
+                self.put_pixel(vec2(x as f32, y), 0., color);
             }
         } else {
             // Mostly vertical line
@@ -64,7 +68,7 @@ impl Canvas {
             let xs = interpolate(y0, p0.x, y1, p1.x);
             for y in y0..=y1 {
                 let x = xs[(y - y0) as usize];
-                self.put_pixel(vec2(x, y as f32), color);
+                self.put_pixel(vec2(x, y as f32), 0., color);
             }
         }
     }
@@ -134,13 +138,8 @@ impl Canvas {
                 let z = z_segment[(x - x_l) as usize];
                 let h = h_segment[(x - x_l) as usize];
 
-                let screen_index =
-                    ((CANVAS_BOUND_Y as i32 - y) * CANVAS_WIDTH as i32) + CANVAS_BOUND_X as i32 + x;
-                if z > self.depth_buffer[screen_index as usize] {
-                    self.depth_buffer[screen_index as usize] = z;
-                    let shaded_color = color.scaled(h);
-                    self.put_pixel(vec2(x as f32, y as f32), &shaded_color);
-                }
+                let shaded_color = color.scaled(h);
+                self.put_pixel(vec2(x as f32, y as f32), z, &shaded_color);
             }
         }
     }

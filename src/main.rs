@@ -48,8 +48,8 @@ fn main() {
         ],
     };
 
-    let cube1 = Instance::new(cube_model.clone(), 0.8, 210.0, vec3(-1.5, -1.0, 5.0));
-    let cube2 = Instance::new(cube_model.clone(), 1.0, 45.0, vec3(1.5, 1.5, 6.0));
+    let cube1 = Instance::new(cube_model.clone(), 0.8, 210.0, vec3(-1.5, -1.0, 7.0));
+    let cube2 = Instance::new(cube_model.clone(), 1.0, 45.0, vec3(1.5, 1.5, 7.0));
     canvas.render_scene(vec![cube1, cube2]);
 
     window.set_target_fps(60);

@@ -8,8 +8,8 @@ pub const CANVAS_HEIGHT: f32 = 640.;
 pub const CANVAS_BOUND_X: f32 = CANVAS_WIDTH / 2.;
 pub const CANVAS_BOUND_Y: f32 = CANVAS_HEIGHT / 2.;
 
-pub const VIEWPORT_HEIGHT: f32 = 2.;
-pub const VIEWPORT_WIDTH: f32 = 2.;
+pub const VIEWPORT_HEIGHT: f32 = 1.;
+pub const VIEWPORT_WIDTH: f32 = 1.;
 pub const VIEWPORT_DISTANCE: f32 = 1.;
 
 pub fn interpolate(i0: i32, d0: f32, i1: i32, d1: f32) -> Vec<f32> {
