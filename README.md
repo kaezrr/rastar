@@ -1,0 +1,6 @@
+# Raster
+A software renderer made in Rust...
+<br>
+![image](https://github.com/user-attachments/assets/d63393d8-9ac1-469b-be9b-59d7ba6ed7d8)
+<br>
+yeah its incomplete...
