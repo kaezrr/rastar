@@ -4,7 +4,7 @@ mod utils;
 
 use canvas::Canvas;
 use minifb::{Key, Window, WindowOptions};
-use structs::{Instance, Model, Triangle};
+use structs::{Color, Instance, Model, Triangle};
 use utils::{CANVAS_HEIGHT, CANVAS_WIDTH};
 
 use glam::vec3;
@@ -48,10 +48,9 @@ fn main() {
         ],
     };
 
-    let cube1 = Instance::new(&cube_model, 1.0, 0.0, vec3(-1.5, 0.0, 7.0));
-    let cube2 = Instance::new(&cube_model, 1.0, 0.0, vec3(1.5, 1.5, 7.0));
-
-    canvas.render_scene(&vec![cube1, cube2]);
+    let cube1 = Instance::new(cube_model.clone(), 1.0, 0.0, vec3(-1.5, 0.0, 4.0));
+    let cube2 = Instance::new(cube_model.clone(), 1.0, 0.0, vec3(1.5, 1.5, 4.0));
+    canvas.render_scene(vec![cube1, cube2]);
 
     window.set_target_fps(60);
     while window.is_open() && !window.is_key_down(Key::Escape) {
