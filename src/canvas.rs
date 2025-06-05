@@ -21,7 +21,7 @@ impl Canvas {
     pub fn new() -> Self {
         Canvas {
             buffer: vec![0x1B1E1F; (CANVAS_HEIGHT * CANVAS_WIDTH) as usize],
-            depth_buffer: vec![f32::INFINITY; (CANVAS_HEIGHT * CANVAS_WIDTH) as usize],
+            depth_buffer: vec![0.; (CANVAS_HEIGHT * CANVAS_WIDTH) as usize],
         }
     }
 
@@ -136,7 +136,8 @@ impl Canvas {
 
                 let screen_index =
                     ((CANVAS_BOUND_Y as i32 - y) * CANVAS_WIDTH as i32) + CANVAS_BOUND_X as i32 + x;
-                if z < self.depth_buffer[screen_index as usize] {
+                if z > self.depth_buffer[screen_index as usize] {
+                    self.depth_buffer[screen_index as usize] = z;
                     let shaded_color = color.scaled(h);
                     self.put_pixel(vec2(x as f32, y as f32), &shaded_color);
                 }
@@ -155,7 +156,7 @@ impl Canvas {
         for v in instance.model.vertices.iter() {
             let v_t = transform.transform_point3(*v);
             let proj = project_vertex(v_t);
-            projected.push(vec3(proj.x, proj.y, v_t.z));
+            projected.push(vec3(proj.x, proj.y, 1. / v_t.z));
         }
 
         for t in &instance.model.triangles {
