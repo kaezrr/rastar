@@ -3,7 +3,7 @@ use std::f32::consts::FRAC_1_SQRT_2;
 
 use crate::{
     structs::{Color, Instance, Plane, Triangle},
-    utils::{VIEWPORT_DISTANCE, clip_scene},
+    utils::{VIEWPORT_DISTANCE, clip_scene, cull_backfaces},
 };
 use glam::{Affine3A, Mat3A, Vec2, Vec3, vec2, vec3, vec3a};
 
@@ -27,14 +27,12 @@ impl Canvas {
 
     pub fn put_pixel(&mut self, p: Vec2, z: f32, color: &Color) {
         let p = vec2(p.x.round(), p.y.round());
-        if p.x < -CANVAS_BOUND_X || p.x >= CANVAS_BOUND_X {
-            return;
-        }
+        let screen_index: usize =
+            (((CANVAS_BOUND_Y - p.y) * CANVAS_WIDTH) + CANVAS_BOUND_X + p.x).round() as usize;
 
-        if p.y < -CANVAS_BOUND_Y || p.y >= CANVAS_BOUND_Y {
+        if screen_index >= self.buffer.len() {
             return;
         }
-        let screen_index = ((CANVAS_BOUND_Y - p.y) * CANVAS_WIDTH) + CANVAS_BOUND_X + p.x;
 
         if z < self.depth_buffer[screen_index as usize] {
             return;
@@ -175,8 +173,8 @@ impl Canvas {
 
     pub fn render_scene(&mut self, scene: Vec<Instance>) {
         let m_camera = Affine3A {
-            translation: vec3a(0., 0., 0.),
-            matrix3: Mat3A::from_rotation_y(0.),
+            translation: vec3a(0.0, 0.0, 0.0),
+            matrix3: Mat3A::from_rotation_y(0_f32.to_radians()),
         };
 
         let planes = vec![
@@ -189,8 +187,9 @@ impl Canvas {
 
         let clipped_scene = clip_scene(scene, &planes);
 
-        for instance in clipped_scene {
+        for mut instance in clipped_scene {
             let m = m_camera * instance.transform;
+            cull_backfaces(&mut instance, &m);
             self.render_instance(&instance, &m);
         }
     }

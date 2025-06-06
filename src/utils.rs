@@ -1,4 +1,4 @@
-use glam::{Vec2, Vec3, vec2};
+use glam::{Affine3A, Vec2, Vec3, vec2};
 
 use crate::structs::{Instance, Plane, Triangle};
 use arrayvec::ArrayVec;
@@ -118,4 +118,19 @@ pub fn clip_scene(scene: Vec<Instance>, planes: &[Plane]) -> Vec<Instance> {
         clipped_scene.extend(clip_instance(instance, planes));
     }
     clipped_scene
+}
+
+pub fn cull_backfaces(instance: &mut Instance, camera: &Affine3A) {
+    let transformed: Vec<Vec3> = instance
+        .model
+        .vertices
+        .iter()
+        .map(|v| camera.transform_point3(*v))
+        .collect();
+
+    instance.model.triangles.retain(|t| {
+        let cm_vec = -transformed[t.v0];
+        let t_norm = t.normal(&transformed);
+        cm_vec.dot(t_norm) > 0.
+    });
 }

@@ -47,6 +47,12 @@ impl Triangle {
             color: Color::new(color),
         }
     }
+
+    pub fn normal(&self, vertices: &[Vec3]) -> Vec3 {
+        let vc1 = vertices[self.v1] - vertices[self.v0];
+        let vc2 = vertices[self.v2] - vertices[self.v0];
+        vc1.cross(vc2)
+    }
 }
 
 #[derive(Clone)]
